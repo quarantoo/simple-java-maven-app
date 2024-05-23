@@ -1,16 +1,41 @@
 pipeline {
     agent any
+
+    environment {
+        MAVEN_HOME = 'C:\\path\\to\\maven'
+        PATH = "${MAVEN_HOME}\\bin;${env.PATH}"
+    }
+
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'your-linux-command'
-                    } else {
-                        bat 'your-windows-command'
-                    }
-                }
+                bat 'mvn clean install'
             }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'mvn package'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            junit '**/target/surefire-reports/*.xml'
         }
     }
 }
