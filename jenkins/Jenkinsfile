@@ -1,9 +1,15 @@
 pipeline {
     agent any
     stages {
-        stage('Build') { 
+        stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package' 
+                script {
+                    if (isUnix()) {
+                        sh 'your-linux-command'
+                    } else {
+                        bat 'your-windows-command'
+                    }
+                }
             }
         }
     }
